@@ -1,0 +1,26 @@
+@startuml
+!include <C4/C4_Context>
+skinparam rectangle {
+  BackgroundColor<<API>> #DDDDFF
+  BackgroundColor<<Service>> #DDFFDD
+  BackgroundColor<<DB>> #FFDDDD
+  BackgroundColor<<Adapter>> #FFF0AA
+}
+
+actor User
+
+rectangle "F1 Betting Backend" {
+  rectangle "REST API" <<API>> as WebAPI
+  rectangle "Betting Service" <<Service>> as Service
+  database "H2 DB" <<DB>> as DB
+  rectangle "OpenF1 Adapter" <<Adapter>> as Adapter
+}
+
+rectangle "OpenF1 API" as OpenF1
+
+User --> WebAPI : Uses
+WebAPI --> Service : Delegates
+Service --> DB : Persists
+Service --> Adapter : Fetch Events
+Adapter --> OpenF1 : REST Call
+@enduml

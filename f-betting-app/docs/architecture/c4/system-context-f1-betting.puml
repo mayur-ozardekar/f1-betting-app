@@ -1,0 +1,44 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+!include <C4/C4_Context>
+
+LAYOUT_WITH_LEGEND()
+
+Person(user, "User", "Places bets via REST API")
+
+Container_Boundary(c1, "F1 Betting Backend") {
+
+    Component(controller, "REST Controller", "Spring Web", "Handles HTTP requests")
+    Component(service, "BettingService", "Application Layer", "Coordinates use cases")
+
+    Component(domain, "Domain Models", "Java Records", "User, Bet, F1Event, Odds")
+    Component(portUser, "UserRepositoryPort", "Port Interface", "Abstracts user persistence")
+    Component(portBet, "BetRepositoryPort", "Port Interface", "Abstracts bet persistence")
+    Component(portEvent, "EventFetcherPort", "Port Interface", "Abstracts F1 event fetching")
+
+    Component(adapterUser, "User JPA Adapter", "Spring Data JPA", "Handles User persistence") #FFDDDD
+    Component(adapterBet, "Bet JPA Adapter", "Spring Data JPA", "Handles Bet persistence") #FFDDDD
+    Component(adapterF1, "OpenF1 Adapter", "WebClient", "Calls OpenF1 API") #FFFACD
+}
+
+System_Ext(openf1, "OpenF1 API", "Provides historical F1 data")
+
+ContainerDb(db, "H2 In-Memory DB", "Relational DB", "Stores Users and Bets")
+
+' Relationships
+Rel(user, controller, "Uses", "HTTP/JSON")
+Rel(controller, service, "Delegates to")
+Rel(service, domain, "Uses domain model")
+Rel(service, portUser, "Calls")
+Rel(service, portBet, "Calls")
+Rel(service, portEvent, "Calls")
+
+Rel(portUser, adapterUser, "Implemented by")
+Rel(portBet, adapterBet, "Implemented by")
+Rel(portEvent, adapterF1, "Implemented by")
+
+Rel(adapterUser, db, "Reads/Writes")
+Rel(adapterBet, db, "Reads/Writes")
+Rel(adapterF1, openf1, "Calls via REST")
+
+@enduml

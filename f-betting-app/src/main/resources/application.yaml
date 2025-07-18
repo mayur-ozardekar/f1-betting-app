@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: f-betting-app
+  datasource:
+    url: jdbc:h2:mem:f1db
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: true
+
+server:
+  port: 8080
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      base-path: /management
+      exposure:
+        include:
+          - info
+          - health
+          - metrics
+    access:
+      default: unrestricted
+  endpoint:
+    info:
+      access: unrestricted
+    health:
+      access: unrestricted
+    metrics:
+      access: unrestricted
+

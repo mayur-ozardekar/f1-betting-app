@@ -1,0 +1,61 @@
+@startuml
+!include <C4/C4_Context>
+title F1 Betting Service - Sequence Flow (with Error Handling)
+
+actor User
+boundary Controller as C
+control BettingService as S
+entity UserRepositoryPort as UR
+entity BetRepositoryPort as BR
+entity EventFetcherPort as EF
+control GlobalExceptionHandler as GEH
+database Database
+
+== Fetch Events ==
+
+User -> C : GET /api/bets/events
+C -> S : listEvents()
+S -> EF : fetchEvents()
+EF -> EF : call OpenF1 /sessions
+EF -> EF : call OpenF1 /drivers?session_key
+EF --> S : List<EventWithDrivers>
+S --> C : List<EventWithDrivers>
+C --> User : 200 OK
+
+== Place Bet ==
+
+User -> C : POST /api/bets/place
+C -> S : placeBet(userId, eventId, driverId, amount)
+S -> UR : findById(userId)
+alt User not found or low balance
+    S -> GEH : throw BettingServiceException
+    GEH --> C : 400 Bad Request + Error JSON
+    C --> User : Error Response
+else
+    UR --> S : User
+    S -> BR : save(Bet)
+    BR -> Database : INSERT INTO bet
+    BR --> S : Bet
+    S --> C : Bet
+    C --> User : 200 OK
+end
+
+== Simulate Event ==
+
+User -> C : POST /api/bets/simulate
+C -> S : simulateEvent(eventId, winningDriverId)
+S -> BR : findByEventId(eventId)
+BR --> S : List<Bet>
+loop for each bet
+    S -> UR : findById(bet.userId)
+    alt bet.driverId == winningDriverId
+        S -> UR : save(User + winnings)
+        S -> BR : save(bet.status = WON)
+    else
+        S -> BR : save(bet.status = LOST)
+    end
+end
+S --> C : void
+C --> User : 200 OK
+
+@enduml
