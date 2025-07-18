@@ -28,13 +28,15 @@ A cleanly architected Spring Boot 3.x backend service that enables users to bet 
 - Bets are stored locally in DB
 - Simulation changes bet state and updates user balance
 
-![Context Diagram](assets/c4/c4_context_diagram.svg)
+![System Context Diagram](service/assets/c4/container-context-f1-betting.svg)
 
 ### ✅ C4 Container
 
+![Container Context Diagram](service/assets/c4/system-context-f1-betting.svg)
+
 ### Sequence Diagram
 
-![Sequence Diagram](assets/sequence/bet_process_sequence_diagram.svg)
+![Sequence Diagram](service/assets/sequence/f1-betting-sequence.svg)
 
 ---
 
